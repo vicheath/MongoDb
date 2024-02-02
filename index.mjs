@@ -2,6 +2,8 @@ import express from "express"
 import dotenv from "dotenv"
 dotenv.config()
 import mongoose from "mongoose"
+import grades from "./routes/grades.mjs"
+
 // Connection string
 const ATLAS_URI = process.env.ATLAS_URI
 const db = mongoose.connection
@@ -16,19 +18,18 @@ const app = express();
 
 
 
-// app.use(cors());
-// app.use(express.json());
+app.use(express.json());
 
-// // Load the /posts routes
+// Load the /posts routes
 // app.use("/posts", posts);
-// app.use('/grades', grades)
+app.use('/grades', grades)
 
-// // Global error handling
-// app.use((err, _req, res, next) => {
-//   res.status(500).send("Uh oh! An unexpected error occured.");
-// });
+// Global error handling
+app.use((err, _req, res, next) => {
+  res.status(500).send("Uh oh! An unexpected error occured.");
+});
 
-// // start the Express server
-// app.listen(PORT, () => {
-//   console.log(`Server is running on port: ${PORT}`);
-// });
+// start the Express server
+app.listen(PORT, () => {
+  console.log(`Server is running on port: ${PORT}`);
+});

@@ -1,10 +1,75 @@
 import express from 'express'
 import db from "../db/conn.mjs"
-import grade from '../models/grades.mjs'
+import Grade from '../models/grades.mjs'
 import { ObjectId } from 'mongodb'
 
 const router = express.Router()
 
+//Mongoose
+// Get a single grade entry
+router.get("/:id", async (req, res) => {
+  let foundGrade = await Grade.findById(req.params.id)
+  res.status(200).json({
+    data: foundGrade
+  })
+})
+
+//Delete a single grade entry
+router.delete('/:id', async(req, res) => {
+  await Grade.findByIdAndDelete(req.params.id)
+  res.status(294).json({
+    data: 'No content'
+  })
+})
+
+// router.delete(“/:id”, async (req, res, next) => {
+//   const data = await Grade.findByIdAndDelete(req.params.id);
+
+//     if(!data) {
+//       return res.status(404).json({
+//            status: “fail”,
+//            data: {
+//                message: “Not found”
+//             }
+//         })
+//     }
+
+//   return res.status(204).json({
+//          status: “success”,
+//          data: null;
+//     })
+// })
+
+
+// Find All Grades
+router.get('/', async(req, res) => {
+  let foundGrades = await Grade.find();
+  res.status(200).json(foundGrades);
+})
+
+
+// Update a single grade entry
+router.patch("/:id", async (req, res) => {
+  const updatedGrade = await Grade.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  if (!updatedGrade) {
+      return res.status(404).json({ error: 'Grade not found' });
+  }
+  res.status(200).json(updatedGrade);
+});
+// Update a class id
+router.patch("/class/:id", async (req, res) => {
+  let collection = await db.collection("grades")
+  let query = { class_id: Number(req.params.id) }
+
+  let result = await collection.updateMany(query, {
+    $set: { class_id: req.body.class_id }
+  })
+
+  if (!result) res.send("Not found").status(404)
+  else res.send(result).status(200)
+})
+
+// MONGODB
 // Create a single grade entry
 router.post('/', async (req,res) =>{
     let collection = await db.collection('grades')
